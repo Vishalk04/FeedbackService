@@ -19,10 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import com.app.main.FeedbackServiceApplication;
-import com.app.main.repository.FeedbackRepository;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = FeedbackServiceApplication.class)
@@ -35,16 +32,13 @@ public class FeedbackControllerTest {
 	@Autowired
 	private WebApplicationContext wac;
 
-	@Autowired
-	private FeedbackRepository feedbackRepository;
-
-	@Before
+	@Before 
 	public void setUp() throws Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
 	@Test 
-	public void verifyPostFeedback() throws Exception {
+	public void verifyPostFeedback() throws Exception{
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/feedback").contentType(MediaType.APPLICATION_JSON).content("{  \"description\": \"string\", \"rating\": 3,\"source\": \"yash\",\"userName\": \"usr121\"}")
 				.accept(MediaType.APPLICATION_JSON)).andDo(print())
@@ -53,21 +47,12 @@ public class FeedbackControllerTest {
 		.andExpect(jsonPath("$.userName").exists())
 		.andExpect(jsonPath("$.rating").exists())
 		.andExpect(jsonPath("$.source").value("yash"))
-		.andExpect(jsonPath("$.userName").value("usr121")); 
+		.andExpect(jsonPath("$.userName").value("usr121"));  
 	} 
 
 	@Test
 	public void verifyAllFedback() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.get("/feedback").accept(MediaType.APPLICATION_JSON)).andExpect(jsonPath("$", hasSize(2))).andDo(print());
-	}
-
-	@Test
-	public void verifyNullAllFeedback() throws Exception { 
-		feedbackRepository.deleteAll();
-		mockMvc.perform(MockMvcRequestBuilders.get("/feedback").accept(MediaType.APPLICATION_JSON))
-		.andExpect(status().is(404))
-		.andExpect(status().reason("Feedback does not exist"))
-		.andDo(print());
 	}
 
 	@Test 

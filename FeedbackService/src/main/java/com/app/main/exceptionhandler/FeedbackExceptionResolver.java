@@ -1,8 +1,6 @@
 package com.app.main.exceptionhandler;
 
-import java.sql.SQLException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.app.main.customexception.FeedbackNotFoundException;
 import com.app.main.model.FeedbackFieldError;
 
 @ControllerAdvice
@@ -24,7 +23,7 @@ public class FeedbackExceptionResolver extends ResponseEntityExceptionHandler{
 			HttpHeaders headers, 
 			HttpStatus status,
 			WebRequest request  
-			) {
+			) { 
  
 		BindingResult bindingResult = ex.getBindingResult();  
 
@@ -33,23 +32,17 @@ public class FeedbackExceptionResolver extends ResponseEntityExceptionHandler{
 						fieldError.getField(),
 						fieldError.getRejectedValue(), 
 						fieldError.getDefaultMessage())
-						)
+						) 
 				.collect(Collectors.toList());  
 
 		return new ResponseEntity<>(feedbackFieldErrors, HttpStatus.BAD_REQUEST);
 	}  
-
-	@ExceptionHandler(value = NoSuchElementException.class)
+	
+	@ExceptionHandler(value = FeedbackNotFoundException.class)
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Feedback does not exist")
-	public ResponseEntity<?> handleNoSuchElementException(NoSuchElementException ex, WebRequest request) {
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);  
+	public ResponseEntity<?> handleFeedbackNotFoundException(FeedbackNotFoundException ex, WebRequest request) {
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
 	}  
-
-	@ExceptionHandler(value  = SQLException.class) 
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error connecting to database")
-	protected  ResponseEntity<?> handleSQLException(SQLException ex, WebRequest request) {
-		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);     
-	}
 }
 
 

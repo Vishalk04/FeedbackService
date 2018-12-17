@@ -2,11 +2,8 @@ package com.app.main.exceptionhandler;
 
 import static org.junit.Assert.assertEquals;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -22,6 +19,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
 
+import com.app.main.customexception.FeedbackNotFoundException;
+
 @RunWith(MockitoJUnitRunner.class)
 public class FeedbackExceptionResolverTest {
 
@@ -31,16 +30,16 @@ public class FeedbackExceptionResolverTest {
 	@Mock
 	private BindingResult bindingResult;
 
-	@Mock
+	@Mock 
 	private WebRequest webRequest;
 
 	@Mock
-	private MethodParameter parameter;  
+	private MethodParameter parameter;   
  
 	@Test
-	public void handleMethodArgumentNotValid() { 
+	public void handleMethodArgumentNotValid() {  
 
-		MethodArgumentNotValidException ex = new MethodArgumentNotValidException(parameter, bindingResult);
+		MethodArgumentNotValidException ex = new MethodArgumentNotValidException(parameter, bindingResult); 
 
 		FieldError fieldError = new FieldError("feedback", "rating", 0, false, null, null, "rating should be more than o");
 
@@ -50,22 +49,15 @@ public class FeedbackExceptionResolverTest {
 
 		ResponseEntity<Object> feedbackError = feedbackExceptionResolver.handleMethodArgumentNotValid(ex, HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST, webRequest);
 
-		assertEquals(HttpStatus.BAD_REQUEST, feedbackError.getStatusCode()); 
+		assertEquals(HttpStatus.BAD_REQUEST, feedbackError.getStatusCode());  
 	 } 
  
 	@Test
-	public void testHandleNoContent() {
+	public void testFeedbackNotFoundException() {
 
-		NoSuchElementException noSuchElementException = new NoSuchElementException(); 
+		FeedbackNotFoundException feedbackNotFoundException = new FeedbackNotFoundException(); 
 		
-		assertEquals(HttpStatus.NOT_FOUND, feedbackExceptionResolver.handleNoSuchElementException(noSuchElementException, webRequest).getStatusCode());
+		assertEquals(HttpStatus.NOT_FOUND, feedbackExceptionResolver.handleFeedbackNotFoundException(feedbackNotFoundException, webRequest).getStatusCode());
 	}
 
-	@Test
-	public void testHandleSQLException() {
-
-		SQLException sqlException = new SQLException();
-
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, feedbackExceptionResolver.handleSQLException(sqlException, webRequest).getStatusCode());
-	}
 }
